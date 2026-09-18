@@ -1,0 +1,100 @@
+.google_routeplaner td,
+.google_routeplaner th  {
+	padding: 10px;
+}
+
+.google_routeplaner .success {
+	color: #4f8a10;
+	background: #dff2bf url(images/success.png) no-repeat;
+	border: 1px solid #4f8a10;
+	padding:15px 10px 15px 50px;
+	background-position: 10px center;
+	font-weight: bold;
+}
+
+.google_routeplaner .error {
+	color: #d8000c;
+	background: #ffbaba url(images/error.png) no-repeat;
+	border: 1px solid #d8000c;
+	padding:15px 10px 15px 50px;
+	background-position: 10px center;
+	font-weight: bold;
+}
+
+.google_routeplaner .gr_import {
+	background-image: url(images/import.png);
+	background-repeat: no-repeat;
+	padding:15px 10px 15px 50px;
+	background-position: 10px center;
+}
+
+.google_routeplaner .gr_notice {
+	color: #9f6000;
+	background: #feefb3;
+	border: 1px solid #9f6000;
+	padding: 10px;
+	background-position: 10px center;
+	font-weight: bold;
+}
+
+.google_routeplaner ul {
+	list-style-type: disc;
+	padding-left: 15px;
+}
+
+.google_routeplaner tr.odd {
+	background-color: #EEE;
+}
+
+.google_routeplaner a.button {
+	background-color: #FFF;
+}
+
+#icon-google_routeplaner  {
+    background:url(images/routeplanner_icon_grey.png) no-repeat scroll 1px 1px transparent;
+}
+
+.google_routeplaner h2 {
+	margin-bottom: 10px;
+}
+
+.google_routeplaner .formbold {
+	font-weight: bold;
+}
+
+table.plugins tr#google-routeplanner td.plugin-title {
+   background: url(images/routeplanner_icon_grey.png) no-repeat scroll 0 4px transparent;
+   padding-left: 44px;
+}
+
+.google_routeplaner .gr_preview {
+	 background: url(images/preview.png) 6px center no-repeat;
+	 padding-left: 24px;
+}
+
+.google_routeplaner .gr_preview:hover {
+	 background: url(images/preview.png) 6px center no-repeat;
+}
+
+.google_routeplaner .gr_edit {
+	 background: url(images/edit.png) 6px center no-repeat;
+	 padding-left: 24px;
+}
+
+.google_routeplaner .gr_edit:hover {
+	 background: url(images/edit.png) 6px center no-repeat;
+}
+
+.google_routeplaner .gr_delete {
+	 background: url(images/delete.png) 6px center no-repeat;
+	 padding-left: 26px;
+}
+
+.google_routeplaner .gr_delete:hover {
+	 background: url(images/delete.png) 6px center no-repeat;
+}
+
+.google_routeplaner .routecode {
+	width: 150px;
+	text-align: center;
+}
