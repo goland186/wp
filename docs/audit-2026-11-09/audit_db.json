@@ -1,0 +1,418 @@
+{
+  "siteurl": "https://caranddriver.ru",
+  "home": "https://caranddriver.ru",
+  "blogname": "Car &amp; Driver Russia",
+  "blogdescription": "Автомобильный портал - Автоновости, обзоры автомобилей, тест-драйвы",
+  "admin_email": "tchumatchenko@gmail.com",
+  "db_version": "44719",
+  "template": "colormag",
+  "stylesheet": "colormag",
+  "permalink_structure": "/%year%/%monthnum%/%day%/%postname%/",
+  "wplang": "ru_RU",
+  "timezone": "Europe/Moscow",
+  "users_can_register": "0",
+  "comment_moderation": "1",
+  "active_plugins_raw": [
+    "all-in-one-schemaorg-rich-snippets/index.php",
+    "captcha/captcha.php",
+    "cyr3lat/cyr-to-lat.php",
+    "google-analytics-dashboard-for-wp/gadwp.php",
+    "rss-for-yandex-turbo/rss-for-yandex-turbo.php",
+    "rss-for-yandex-zen/rss-for-yandex-zen.php",
+    "slideshow-gallery/slideshow-gallery.php",
+    "uptolike-share/uptolike_share_widget.php",
+    "wordpress-importer/wordpress-importer.php",
+    "wordpress-seo/wp-seo.php",
+    "wp-hide-title/wp-hide-title .php",
+    "wt-yandex-metrika/wt_yandex_metrika.php"
+  ],
+  "users": 5,
+  "user_logins": [
+    "admin",
+    "panferov",
+    "alexche",
+    "Holod77",
+    "zloybober"
+  ],
+  "post_types": [
+    {
+      "post_type": "attachment",
+      "n": 8121,
+      "first": "2010-12-18 03:57:22",
+      "last": "2026-09-01 11:15:42"
+    },
+    {
+      "post_type": "revision",
+      "n": 1801,
+      "first": "2010-12-18 04:07:38",
+      "last": "2026-09-01 11:16:23"
+    },
+    {
+      "post_type": "post",
+      "n": 1209,
+      "first": "2014-10-06 20:46:13",
+      "last": "2026-09-01 11:16:23"
+    },
+    {
+      "post_type": "oembed_cache",
+      "n": 27,
+      "first": "2020-02-27 08:14:56",
+      "last": "2025-07-10 18:28:55"
+    },
+    {
+      "post_type": "nav_menu_item",
+      "n": 15,
+      "first": "2016-05-31 10:06:03",
+      "last": "2016-06-20 21:14:10"
+    },
+    {
+      "post_type": "page",
+      "n": 2,
+      "first": "2016-05-31 09:56:36",
+      "last": "2016-06-11 12:21:46"
+    },
+    {
+      "post_type": "amn_exact-metrics",
+      "n": 1,
+      "first": "2018-05-21 15:29:12",
+      "last": "2018-05-21 15:29:12"
+    }
+  ],
+  "post_statuses": [
+    {
+      "post_status": "inherit",
+      "n": 9922
+    },
+    {
+      "post_status": "publish",
+      "n": 1242
+    },
+    {
+      "post_status": "draft",
+      "n": 10
+    },
+    {
+      "post_status": "private",
+      "n": 1
+    },
+    {
+      "post_status": "pending",
+      "n": 1
+    }
+  ],
+  "pages": [
+    {
+      "ID": 8,
+      "post_title": "Автомобильный портал",
+      "post_name": "avtomobilnyj-portal",
+      "post_status": "publish",
+      "post_author": 1,
+      "post_modified": "2018-10-01 23:37:31"
+    },
+    {
+      "ID": 5010,
+      "post_title": "О нас",
+      "post_name": "o-nas",
+      "post_status": "publish",
+      "post_author": 1,
+      "post_modified": "2018-10-03 20:07:09"
+    }
+  ],
+  "posts_count_published": 1198,
+  "attachments": 8121,
+  "attachment_mime": [
+    {
+      "m": "image/jpeg",
+      "n": 7716
+    },
+    {
+      "m": "image/png",
+      "n": 381
+    },
+    {
+      "m": "image/gif",
+      "n": 19
+    },
+    {
+      "m": "video/mp4",
+      "n": 4
+    },
+    {
+      "m": "image/tiff",
+      "n": 1
+    }
+  ],
+  "taxonomies": [
+    {
+      "taxonomy": "post_tag",
+      "n": 1159
+    },
+    {
+      "taxonomy": "category",
+      "n": 123
+    },
+    {
+      "taxonomy": "nav_menu",
+      "n": 6
+    },
+    {
+      "taxonomy": "vehicle_condition",
+      "n": 2
+    },
+    {
+      "taxonomy": "post_format",
+      "n": 2
+    },
+    {
+      "taxonomy": "vehicle_year",
+      "n": 1
+    },
+    {
+      "taxonomy": "vehicle_model",
+      "n": 1
+    },
+    {
+      "taxonomy": "vehicle_make",
+      "n": 1
+    },
+    {
+      "taxonomy": "vehicle_location",
+      "n": 1
+    }
+  ],
+  "menus": [
+    {
+      "term_id": 7,
+      "name": "Menu 1",
+      "count": 2
+    },
+    {
+      "term_id": 8,
+      "name": "Main Menu",
+      "count": 9
+    },
+    {
+      "term_id": 688,
+      "name": "Header Menu",
+      "count": 2
+    },
+    {
+      "term_id": 689,
+      "name": "Closer: About",
+      "count": 0
+    },
+    {
+      "term_id": 690,
+      "name": "Closer: Need Help?",
+      "count": 0
+    },
+    {
+      "term_id": 691,
+      "name": "Closer: User Area",
+      "count": 2
+    }
+  ],
+  "sidebars_widgets_raw_head": "a:18:{s:19:\"wp_inactive_widgets\";a:8:{i:0;s:32:\"colormag_featured_posts_widget-6\";i:1;s:8:\"search-2\";i:2;s:33:\"colormag_featured_posts_widget-11\";i:3;s:42:\"colormag_featured_posts_vertical_widget-12\";i:4;s:42:\"colormag_featured_posts_vertical_widget-15\";i:5;s:38:\"colormag_728x90_advertisement_widget-7\";i:6;s:39:\"colormag_125x125_advertisement_widget-5\";i:7;s:10:\"calendar-6\";}s:22:\"colormag_right_sidebar\";a:4:{i:0;s:40:\"colormag_300x250_advertisement_widget-10\";i:1;s:40:\"colormag_300x250_advertisement_widget-12\";i:2;s:41:\"colormag_featured_posts_vertical_widget-9\";i:3;s:40:\"colormag_300x250_advertisement_widget-11\";}s:21:\"colormag_left_sidebar\";a:0:{}s:23:\"colormag_header_sidebar\";a:0:{}s:31:\"colormag_front_page_slider_area\";a:1:{i:0;s:39:\"colormag_featured_posts_slider_widget-3\";}s:38:\"colormag_front_page_area_beside_slider\";a:1:{i:0;s:35:\"colormag_highlighted_posts_widget-3\";}s:39:\"colormag_front_page_content_top_section\";a:2:{i:0;s:32:\"colormag_featured_posts_widget-5\";i:1;s:38:\"colormag_728x90_advertisement_widget-5\";}s:47:\"colormag_front_page_content_middle_left_section\";a:1:{i:0;s:42:\"colormag_featured_posts_vertical_widget-14\";}s:48:\"colormag_front_page_content_middle_right_section\";a:1:{i:0;s:42:\"colormag_featured_posts_vertical_widget-16\";}s:42:\"colormag_front_page_content_bottom_section\";a:0:{}s:29:\"colormag_contact_page_sidebar\";a:0:{}s:31:\"colormag_error_404_page_sidebar\";a:0:{}s:47:\"colormag_advertisement_above_the_footer_sidebar\";a:0:{}s:27:\"colormag_footer_sidebar_one\";a:0:{}s:27:\"colormag_footer_sidebar_two\";a:0:{}s:29:\"colormag_footer_sidebar_three\";a:0:{}s:28:\"colormag_footer_sidebar_four\";a:0:{}s:13:\"array_version\";i:3;}",
+  "builders": {
+    "gutenberg (wp-block-)": 772,
+    "wpbakery ([vc_row]": 0,
+    "elementor (в контенте)": 0,
+    "elementor (мета _elementor_data)": 0,
+    "divi (et_pb_)": 2,
+    "shortcodes общее": 118
+  },
+  "acf_field_groups": 0,
+  "acf_fields": 0,
+  "acf_keys_in_meta": 0,
+  "top_meta_keys": [
+    {
+      "meta_key": "_wp_attached_file",
+      "n": 8121
+    },
+    {
+      "meta_key": "_wp_attachment_metadata",
+      "n": 8099
+    },
+    {
+      "meta_key": "_edit_lock",
+      "n": 1274
+    },
+    {
+      "meta_key": "_edit_last",
+      "n": 1271
+    },
+    {
+      "meta_key": "_yoast_wpseo_content_score",
+      "n": 1211
+    },
+    {
+      "meta_key": "colormag_page_layout",
+      "n": 1207
+    },
+    {
+      "meta_key": "_thumbnail_id",
+      "n": 1202
+    },
+    {
+      "meta_key": "_yoast_wpseo_primary_category",
+      "n": 1192
+    },
+    {
+      "meta_key": "_wp_attachment_image_alt",
+      "n": 1125
+    },
+    {
+      "meta_key": "yzrssenabled_meta_value",
+      "n": 805
+    },
+    {
+      "meta_key": "yzrating_meta_value",
+      "n": 805
+    },
+    {
+      "meta_key": "yzcategory_meta_value",
+      "n": 805
+    },
+    {
+      "meta_key": "_bsf_post_type",
+      "n": 713
+    },
+    {
+      "meta_key": "ytrssenabled_meta_value",
+      "n": 670
+    },
+    {
+      "meta_key": "ytad5meta",
+      "n": 670
+    },
+    {
+      "meta_key": "ytad4meta",
+      "n": 670
+    },
+    {
+      "meta_key": "ytad3meta",
+      "n": 670
+    },
+    {
+      "meta_key": "ytad2meta",
+      "n": 670
+    },
+    {
+      "meta_key": "ytad1meta",
+      "n": 670
+    },
+    {
+      "meta_key": "ytremove_meta_value",
+      "n": 631
+    },
+    {
+      "meta_key": "template_meta",
+      "n": 631
+    },
+    {
+      "meta_key": "_yoast_wpseo_focuskw",
+      "n": 610
+    },
+    {
+      "meta_key": "_yoast_wpseo_linkdex",
+      "n": 604
+    },
+    {
+      "meta_key": "_yoast_wpseo_focuskw_text_input",
+      "n": 529
+    },
+    {
+      "meta_key": "layf_related_links",
+      "n": 446
+    },
+    {
+      "meta_key": "layf_exclude_from_feed",
+      "n": 446
+    },
+    {
+      "meta_key": "_bsf_item_review_type",
+      "n": 341
+    },
+    {
+      "meta_key": "yztypeplatform_meta_value",
+      "n": 187
+    },
+    {
+      "meta_key": "yztypearticle_meta_value",
+      "n": 187
+    },
+    {
+      "meta_key": "yzindex_meta_value",
+      "n": 187
+    },
+    {
+      "meta_key": "ytpostdatemeta",
+      "n": 187
+    },
+    {
+      "meta_key": "ytextendedhtmlmeta",
+      "n": 187
+    },
+    {
+      "meta_key": "_wp_old_date",
+      "n": 168
+    },
+    {
+      "meta_key": "_yoast_wpseo_metadesc",
+      "n": 85
+    },
+    {
+      "meta_key": "wp_review_location",
+      "n": 81
+    },
+    {
+      "meta_key": "wp_review_fontcolor",
+      "n": 81
+    },
+    {
+      "meta_key": "wp_review_desc_title",
+      "n": 81
+    },
+    {
+      "meta_key": "wp_review_color",
+      "n": 81
+    },
+    {
+      "meta_key": "wp_review_bordercolor",
+      "n": 81
+    },
+    {
+      "meta_key": "wp_review_bgcolor2",
+      "n": 81
+    }
+  ],
+  "yoast_title": 19,
+  "yoast_desc": 85,
+  "plugin_tables_counts": {
+    "wpla_sam_ads": 2,
+    "wpla_sam_places": 1,
+    "wpla_gallery_galleries": 0,
+    "wpla_gallery_slides": 0,
+    "wpla_g_routeplanner_plans": 1,
+    "wpla_supsystic_ss_projects": 1,
+    "wpla_ulogin": 3,
+    "wpla_wslusersprofiles": 0,
+    "wpla_duplicator_packages": 1,
+    "wpla_comments": 21425
+  },
+  "wp_version_from_duplicator": "4.6.1",
+  "mysql_from_duplicator": "5.7.11",
+  "php_from_duplicator": "5.4.45",
+  "content_samples": [
+    {
+      "ID": 8,
+      "post_title": "Автомобильный портал",
+      "c": "Автомобильный портал Car and Driver (Автомобиль и Водитель) предоставляет своим читателям оперативную информацию мирового автомобильного рынка, сводки с дорог, шпионские снимки автомобилей, новости, аналитику, независимые тесты-драйвы и обзоры новых автомобилей.\r\nМы предлагаем рекламодателям инструмент под любые цели и бюджеты. Вы можете воспользоваться текстографическими блоками, баннерами и спец"
+    },
+    {
+      "ID": 5010,
+      "post_title": "О нас",
+      "c": "<a href=\"http://caranddriver.ru/wp-content/uploads/2016/06/CDlogo2-300-1.png\"><img class=\"aligncenter size-full wp-image-6606\" src=\"http://caranddriver.ru/wp-content/uploads/2016/06/CDlogo2-300-1.png\" alt=\"\" width=\"300\" height=\"118\" /></a>\r\n\r\n&nbsp;\r\n\r\n«<span style=\"color: #000000;\"><strong>Car &amp; Driver</strong></span>» — это автомобильный журнал про машины, дороги, про людей и для людей,котор"
+    }
+  ]
+}
