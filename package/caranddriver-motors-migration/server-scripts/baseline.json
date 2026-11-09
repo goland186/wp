@@ -1,0 +1,54 @@
+{
+  "site": "caranddriver.ru",
+  "baseline_generated": "2026-11-09",
+  "blogname": "Car & Driver Russia",
+  "blogdescription": "Автомобильный портал - Автоновости, обзоры автомобилей, тест-драйвы",
+  "permalink_structure": "/%year%/%monthnum%/%day%/%postname%/",
+  "counts": {
+    "posts_publish": 1198,
+    "pages": 2,
+    "attachments": 8121,
+    "comments_approved_all": 21425,
+    "categories": 123,
+    "tags": 1159,
+    "users": 5,
+    "nav_menus": 6,
+    "nav_menu_items": 15,
+    "post_tag_total": 1159
+  },
+  "attachment_mime": {
+    "image/jpeg": 7716,
+    "image/png": 381,
+    "image/gif": 19,
+    "video/mp4": 4,
+    "image/tiff": 1
+  },
+  "menus": {
+    "Menu 1": 2,
+    "Main Menu": 9,
+    "Header Menu": 2,
+    "Closer: About": 0,
+    "Closer: Need Help?": 0,
+    "Closer: User Area": 2
+  },
+  "pages_list": [
+    {
+      "ID": 8,
+      "title": "Автомобильный портал",
+      "slug": "avtomobilnyj-portal"
+    },
+    {
+      "ID": 5010,
+      "title": "О нас",
+      "slug": "o-nas"
+    }
+  ],
+  "page_on_front": 8,
+  "show_on_front": "page",
+  "sticky_posts": [
+    14767
+  ],
+  "expected_uploads_files": 67769,
+  "yoast_titles": 19,
+  "yoast_desc": 85
+}
