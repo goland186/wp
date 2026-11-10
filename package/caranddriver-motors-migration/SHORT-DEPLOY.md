@@ -1,0 +1,54 @@
+# Краткая инструкция: забрать с GitHub и запустить (2 действия)
+
+Все файлы уже в репозитории: ядро WordPress, дамп старой БД, тема Motors, дочерняя тема, скрипты, реестры картинок, wp-cli.
+
+## 0. Подготовка (один раз, на новом сервере)
+
+```bash
+# php 8.1+ с расширениями mysql/curl/gd/mbstring/xml/zip и MySQL/MariaDB должны быть установлены
+git clone https://github.com/goland186/wp.git
+cd wp/package/caranddriver-motors-migration
+cp config.env.sample config.env
+nano config.env        # 5 значений: SITE_DIR, DB_NAME, DB_USER, DB_PASS, UPLOADS_SRC
+```
+
+Создайте пустую БД (если пользователь БД не умеет создавать базы сам):
+
+```sql
+CREATE DATABASE wp_cdr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'wp_cdr'@'localhost' IDENTIFIED BY 'СЛОЖНЫЙ_ПАРОЛЬ';
+GRANT ALL PRIVILEGES ON wp_cdr.* TO 'wp_cdr'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+## 1. Действие 1 — развернуть сайт (всё, кроме картинок)
+
+```bash
+bash run-migration.sh config.env
+```
+
+Скрипт сам: скопирует ядро WordPress из репозитория → создаст wp-config (префикс `wpla_`) → импортирует старую БД → заменит домен (если менялся) → настроит ЧПУ → установит Motors + motors-child → установит/активирует плагины → привяжет меню → перенесёт сайдбар → сверит контент со старым сайтом. В конце напечатает таблицу «Старое/Новое» — строки должны быть OK (картинки 404 на этом шаге — норма).
+
+## 2. Действие 2 — скопировать папку uploads и завершить
+
+Скопируйте `uploads` со старого сервера любым способом (в config.env укажите путь в `UPLOADS_SRC`):
+
+```bash
+# на старом сервере — заархивировать:
+tar -czf /root/uploads.tar.gz -C /var/www/caranddriver.ru/wp-content uploads
+# передать на новый сервер (scp) и:
+bash run-migration.sh config.env uploads /root/uploads.tar.gz
+# либо скопировать папку rsync'ом и указать её путь в UPLOADS_SRC:
+bash run-migration.sh config.env uploads
+```
+
+Скрипт сам: скопирует/распакует uploads в `wp-content/uploads/` → выставит права → сверит **все** 8121 вложение и 67 769 файлов с реестром → сгенерирует карту 301 → напечатает итог.
+
+## Готово. Проверьте и опубликуйте
+
+- Главная: блоки в старом порядке (слайдер, баннеры, списки постов).
+- Любая статья: URL вида `/2024/05/12/slug/` — как раньше, без редиректов.
+- `https://домен/sitemap_index.xml` → добавить в Яндекс.Вебмастер и Google Search Console.
+- Логин в админку — **старый** (admin и др. пользователи перенесены из дампа).
+
+Повторный запуск любого шага безопасен: выполненное пропускается.

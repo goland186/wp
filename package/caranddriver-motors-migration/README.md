@@ -1,6 +1,17 @@
 # Готовый продукт миграции: caranddriver.ru → WordPress + Motors
 
-Пакет подготовлен по 8-этапному плану миграции. Продукт готов к развёртыванию на сервере по инструкции **DEPLOY.md** (папка `uploads/` — последний шаг).
+Пакет подготовлен по 8-этапному плану миграции. Продукт готов к развёртыванию на сервере.
+
+## Быстрый старт (2 действия) — СМ. SHORT-DEPLOY.md
+
+Все файлы уже в репозитории: ядро WordPress (`wordpress/`), дамп БД (`database/old_dump.sql`), тема Motors (`new-theme/Motors/`), этот пакет (дочерняя тема + скрипты + wp-cli.phar).
+
+```bash
+git clone https://github.com/goland186/wp.git && cd wp/package/caranddriver-motors-migration
+cp config.env.sample config.env && nano config.env   # 5 значений
+bash run-migration.sh config.env                      # действие 1: сайт целиком
+bash run-migration.sh config.env uploads              # действие 2: папка uploads + финал
+```
 
 ## Что внутри
 
