@@ -102,8 +102,10 @@ log "ШАГ 2/9. wp-config.php (префикс таблиц ${DB_PREFIX} — к�
         wp config create --dbname="$DB_NAME" --dbuser="$DB_USER" --dbpass="$DB_PASS" \
             --dbhost="${DB_HOST:-localhost}" --dbprefix="$DB_PREFIX" --locale=ru_RU --force
         wp config set WP_MEMORY_LIMIT 256M
+        wp config set FS_METHOD direct        # установка тем/плагинов без FTP-доступа
         ok "создан wp-config.php"
     fi
+    wp config set FS_METHOD direct >/dev/null 2>&1 || true
 
 # ---------- 3. БД ----------
 log "ШАГ 3/9. Создание БД (если отсутствует)"
@@ -142,37 +144,96 @@ log "ШАГ 6/9. Постоянные ссылки (как на старом с�
 
 # ---------- 7. Темы ----------
 log "ШАГ 7/9. Темы Motors + motors-child (демо-контент НЕ импортируется)"
-    wp theme is-installed motors 2>/dev/null && ok "Motors уже установлен" || { wp theme install "$MOTORS_ZIP" --force; ok "Motors установлен"; }
-    if [ -d "$SITE_DIR/wp-content/themes/motors-child" ]; then
+    if [ -f "$SITE_DIR/wp-content/themes/motors/style.css" ]; then
+        ok "Motors уже установлен"
+    else
+        mkdir -p "$SITE_DIR/wp-content/themes"
+        MOTORS_TMP="$(mktemp -d)"
+        if command -v unzip >/dev/null 2>&1; then
+            unzip -q -o "$MOTORS_ZIP" -d "$MOTORS_TMP"
+        else
+            wp theme install "$MOTORS_ZIP" --force >/dev/null 2>&1 || true
+        fi
+        if [ -f "$SITE_DIR/wp-content/themes/motors/style.css" ]; then
+            ok "Motors распакован wp-cli"
+        else
+            INNER="$(find "$MOTORS_TMP" -maxdepth 2 -name style.css | head -1)"
+            [ -n "$INNER" ] || { echo "ОШИБКА: в архиве Motors нет style.css"; exit 1; }
+            INNER="$(dirname "$INNER")"
+            rm -rf "$SITE_DIR/wp-content/themes/motors"
+            mv "$INNER" "$SITE_DIR/wp-content/themes/motors"
+            ok "Motors распакован напрямую в wp-content/themes/motors"
+        fi
+        rm -rf "$MOTORS_TMP"
+    fi
+    [ -f "$SITE_DIR/wp-content/themes/motors/style.css" ] || { echo "ОШИБКА: тема Motors не установлена"; exit 1; }
+
+    if [ -f "$SITE_DIR/wp-content/themes/motors-child/style.css" ] && \
+       [ -f "$SITE_DIR/wp-content/themes/motors-child/header.php" ]; then
         ok "motors-child уже установлен"
     else
+        rm -rf "$SITE_DIR/wp-content/themes/motors-child"
         cp -a "$SCRIPT_DIR/motors-child" "$SITE_DIR/wp-content/themes/motors-child"
         ok "motors-child скопирован в wp-content/themes"
     fi
-    wp theme activate motors-child
-    ok "активная тема: motors-child (родитель motors не правится)"
+
+    if wp theme activate motors-child >/dev/null 2>&1; then
+        ok "тема motors-child активирована"
+    else
+        echo "ОШИБКА активации motors-child:"; wp theme activate motors-child || true; exit 1
+    fi
+    ACTIVE_THEME="$(wp theme list --status=active --field=name)"
+    [ "$ACTIVE_THEME" = "motors-child" ] || { echo "ОШИБКА: активна тема '$ACTIVE_THEME', а не motors-child"; exit 1; }
+    ok "проверка: активная тема = motors-child"
 
     # Демо-импорт Motors использовать ЗАПРЕЩЕНО — затрёт контент старого сайта.
 
-# ---------- 8. Плагины ----------
-log "ШАГ 8/9. Плагины (yoast-seo — SEO-мета старых постов подхватится сама)"
+# ---------- 8. Плагины (локальные zip из репозитория, сеть не нужна) ----------
+log "ШАГ 8/9. Плагины из репозитория: wordpress-seo, cyr3lat (cyr-to-lat), captcha"
     # Чистим "хвосты" старого списка активных плагинов (после импорта дампа в нём ссылки на отсутствующие файлы)
-    wp option update active_plugins '[]' >/dev/null 2>&1 || true
-    for PLUG in wordpress-seo cyr-to-lat captcha; do
-        if wp plugin is-installed "$PLUG" 2>/dev/null; then
-            wp plugin activate "$PLUG" >/dev/null 2>&1 && ok "$PLUG активирован" || warn "$PLUG не активирован"
-        elif wp plugin install "$PLUG" --activate >/dev/null 2>&1; then
-            ok "$PLUG установлен и активирован"
+    wp option update active_plugins '[]' --format=json >/dev/null 2>&1 || true
+    for PLUG_ZIP in "$SCRIPT_DIR"/plugins/*.zip; do
+        [ -f "$PLUG_ZIP" ] || { echo "ОШИБКА: нет zip-ов плагинов в $SCRIPT_DIR/plugins/"; exit 1; }
+        PLUG_NAME="$(basename "$PLUG_ZIP" .zip)"
+        if wp plugin install "$PLUG_ZIP" --activate --force >/dev/null 2>&1; then
+            ok "$PLUG_NAME установлен и активирован (из локального zip)"
+        elif wp plugin is-installed "$PLUG_NAME" 2>/dev/null && wp plugin activate "$PLUG_NAME" >/dev/null 2>&1; then
+            ok "$PLUG_NAME активирован (уже был установлен)"
         else
-            warn "$PLUG недоступен (нет сети?) — установите вручную, остальное не пострадает"
+            echo "ОШИБКА: плагин $PLUG_NAME не установился:"; wp plugin install "$PLUG_ZIP" --activate --force || true; exit 1
         fi
     done
+    for PLUG in wordpress-seo cyr3lat captcha; do
+        wp plugin is-active "$PLUG" 2>/dev/null || { echo "ОШИБКА: плагин $PLUG не активен"; wp plugin list; exit 1; }
+        ok "проверка: плагин активен — $PLUG"
+    done
 
-# ---------- 9. Меню и сайдбар ----------
-log "ШАГ 9/9. Меню (Main Menu -> primary) и перенос сайдбара (colormag_right_sidebar -> default)"
-    wp menu location assign "Main Menu" primary 2>/dev/null && ok "меню привязано" \
-        || warn "привяжите меню вручную: Внешний вид -> Меню"
-    wp eval-file "$SCRIPT_DIR/server-scripts/migrate-sidebars.php" default && ok "виджеты правого сайдбара перенесены (настройки сохранены)"
+# ---------- 9. Меню, настройки темы, сайдбар ----------
+log "ШАГ 9/9. Настройки темы (лого, меню, цвета рубрик), привязка меню, сайдбар"
+    wp eval-file "$SCRIPT_DIR/server-scripts/setup-child-mods.php" && ok "настройки старой темы перенесены в motors-child"
+    if wp eval 'echo has_nav_menu("primary") ? "yes" : "no";' 2>/dev/null | grep -q yes; then
+        ok "меню уже привязано к primary (из настроек старой темы)"
+    else
+        wp menu location assign "main-menu" primary 2>/dev/null \
+            || wp menu location assign "Main Menu" primary 2>/dev/null \
+            || warn "меню не привязано автоматически — Внешний вид -> Меню"
+    fi
+    wp eval 'echo has_nav_menu("primary") ? "yes" : "no";' 2>/dev/null | grep -q yes \
+        && ok "проверка: меню привязано к primary" \
+        || { echo "ОШИБКА: меню не привязано к primary"; exit 1; }
+    wp eval-file "$SCRIPT_DIR/server-scripts/migrate-sidebars.php" default && ok "виджеты правого сайдбара продублированы для страниц записей (Motors)"
+
+# ---------- Финальная проверка шапки и подвала ----------
+log "ФИНАЛЬНАЯ ПРОВЕРКА: шапка и подвал рендерятся"
+    HEADER_OK="$(wp eval 'ob_start(); locate_template("header.php", true, true); $h = ob_get_clean(); echo (false !== strpos($h, "id=\"masthead\"") && false !== strpos($h, "site-navigation")) ? "ok" : "fail";')"
+    [ "$HEADER_OK" = "ok" ] && ok "шапка: masthead + меню выводятся" \
+        || { echo "ОШИБКА: header.php не рендерится как ожидается"; exit 1; }
+    FOOTER_OK="$(wp eval 'ob_start(); locate_template("footer.php", true, true); $f = ob_get_clean(); echo (false !== strpos($f, "id=\"colophon\"")) ? "ok" : "fail";')"
+    [ "$FOOTER_OK" = "ok" ] && ok "подвал: colophon выводится" \
+        || { echo "ОШИБКА: footer.php не рендерится как ожидается"; exit 1; }
+    LOGO_ID="$(wp eval 'echo (int) get_theme_mod("custom_logo");')"
+    [ "$LOGO_ID" != "0" ] && ok "лого назначено (вложение #$LOGO_ID — появится после копирования uploads)" \
+        || warn "лого не назначено — проверьте setup-child-mods.php"
 
 # ---------- Контроль контента ----------
 log "КОНТРОЛЬ: сверка контента со старым сайтом (baseline)"

@@ -22,7 +22,7 @@ if ( ! is_array( $baseline ) ) {
 }
 
 $c   = $baseline['counts'];
-$rows = array();
+$GLOBALS['cd_rows'] = array();
 
 /**
  * @param string $metric Название метрики
@@ -31,10 +31,9 @@ $rows = array();
  * @param bool   $hard   Критичное ли расхождение
  */
 function cd_row( $metric, $actual, $expect, $hard = true ) {
-        global $rows;
         $ok     = ( (int) $actual === (int) $expect );
         $status = $ok ? 'OK' : ( $hard ? 'FAIL' : 'WARN' );
-        $rows[] = array( $metric, (string) $expect, (string) $actual, $status );
+        $GLOBALS['cd_rows'][] = array( $metric, (string) $expect, (string) $actual, $status );
         return $ok;
 }
 
@@ -51,8 +50,8 @@ $attach_n = (int) wp_count_posts( 'attachment' )->inherit;
 $checks_ok = cd_row( 'Вложений (медиатека)', $attach_n, $c['attachments'] ) && $checks_ok;
 
 global $wpdb;
-$comments = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved IN ('1','0')" );
-$checks_ok = cd_row( 'Комментариев (одобр. + на модерации)', $comments, $c['comments_approved_all'] ) && $checks_ok;
+$comments = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments}" );
+$checks_ok = cd_row( 'Комментариев (всего)', $comments, $c['comments_approved_all'] ) && $checks_ok;
 
 $cats = (int) wp_count_terms( array( 'taxonomy' => 'category', 'hide_empty' => false ) );
 $checks_ok = cd_row( 'Рубрик', $cats, $c['categories'] ) && $checks_ok;
@@ -67,14 +66,14 @@ $checks_ok = cd_row( 'Пользователей', $users_n, $c['users'] ) && $c
 $menus = (array) wp_get_nav_menus();
 $checks_ok = cd_row( 'Меню', count( $menus ), $c['nav_menus'] ) && $checks_ok;
 
-$menu_items = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy='nav_menu_item'" );
+$menu_items = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='nav_menu_item' AND post_status='publish'" );
 $checks_ok = cd_row( 'Элементов меню', $menu_items, $c['nav_menu_items'] ) && $checks_ok;
 
 // --- Настройки ---
 $checks_ok = cd_row( 'Структура постоянных ссылок', get_option( 'permalink_structure' ) === $baseline['permalink_structure'] ? 1 : 0, 1 ) && $checks_ok;
 $checks_ok = cd_row( 'Главная = статическая страница (show_on_front)', get_option( 'show_on_front' ) === $baseline['show_on_front'] ? 1 : 0, 1 ) && $checks_ok;
 $checks_ok = cd_row( 'page_on_front = ' . $baseline['page_on_front'] . ' («Автомобильный портал»)', (int) get_option( 'page_on_front' ), (int) $baseline['page_on_front'] ) && $checks_ok;
-$checks_ok = cd_row( 'Название сайта', get_option( 'blogname' ) === $baseline['blogname'] ? 1 : 0, 1, false ) && $checks_ok;
+$checks_ok = cd_row( 'Название сайта', wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES ) === $baseline['blogname'] ? 1 : 0, 1, false ) && $checks_ok;
 
 // --- SEO (Yoast) ---
 $yoast_title = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key='_yoast_wpseo_title'" );
@@ -107,7 +106,7 @@ WP_CLI::log( 'Активная тема: ' . $theme->get( 'Name' ) . ' v' . $the
 WP_CLI::log( '' );
 WP_CLI::log( sprintf( '%-58s %12s %12s %6s', 'Метрика', 'Старое', 'Новое', 'Статус' ) );
 WP_CLI::log( str_repeat( '-', 92 ) );
-foreach ( $rows as $r ) {
+foreach ( $GLOBALS['cd_rows'] as $r ) {
         WP_CLI::log( vsprintf( '%-58s %12s %12s %6s', $r ) );
 }
 
@@ -121,7 +120,7 @@ $out = array(
         'all_ok'         => $checks_ok,
         'rows'           => array_map( function ( $r ) {
                 return array( 'metric' => $r[0], 'old' => $r[1], 'new' => $r[2], 'status' => $r[3] );
-        }, $rows ),
+        }, $GLOBALS['cd_rows'] ),
         'baseline_file'  => $baseline_path,
 );
 $out_path = dirname( $baseline_path ) . '/verify-content.json';

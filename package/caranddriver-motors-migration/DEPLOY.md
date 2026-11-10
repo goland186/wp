@@ -1,8 +1,11 @@
 # Инструкция по развёртыванию caranddriver.ru на WordPress + Motors
 
+> **Главный способ установки — автоматический:** `bash run-migration.sh config.env` (см. SHORT-DEPLOY.md).
+> Этот документ — подробная справка по этапам и ручным действиям; все шаги ниже скрипт выполняет сам, с проверками и остановкой при ошибке.
+
 Сайт: **https://caranddriver.ru** — автомобильный портал (1198 публикаций, 8121 медиафайл, 21 425 комментариев).
 Старая среда: WordPress 4.6.1, тема ColorMag 1.3.5, MySQL 5.7, PHP 5.4.
-Новая среда: WordPress 6.x (последняя), тема **Motors 5.6.95** + дочерняя тема **motors-child** (в пакете), PHP 8.1–8.3, MySQL/MariaDB 5.7+/8.
+Новая среда: WordPress 7.1 (в репозитории, папка `wordpress/`), тема **Motors 5.6.95** + дочерняя тема **motors-child** (в пакете), PHP 8.1–8.3, MySQL/MariaDB 5.7+/8.
 
 **Ключевой принцип: URL, слаги, структура постоянных ссылок и пути к картинкам НЕ меняются.** Папка `uploads/` загружается **последним шагом** — до этого картинки будут отдавать 404, это ожидаемо и проверяется отдельным шагом.
 
@@ -12,25 +15,27 @@
 
 ```
 caranddriver-motors-migration/
+├── run-migration.sh          ← ГЛАВНЫЙ СКРИПТ: всё одной командой (deploy / uploads)
+├── config.env.sample         — образец конфигурации (5 значений)
+├── bin/wp-cli.phar           — wp-cli внутри пакета
+├── plugins/                  — zip-ы плагинов (wordpress-seo, cyr3lat, captcha)
 ├── DEPLOY.md                 ← этот документ
+├── SHORT-DEPLOY.md           — краткая инструкция (2 действия)
 ├── README.md                 — обзор продукта и критерии приёмки
 ├── migration-report.md       — таблица сравнения старое/новое + нерешённые вопросы
 ├── motors-child/             — готовая дочерняя тема (загружается как есть)
-│   ├── style.css, functions.php, front-page.php, screenshot.jpg
-│   ├── inc/cd-legacy-functions.php   — хелперы ColorMag (цвета рубрик и пр.)
+│   ├── style.css, functions.php, header.php, footer.php, sidebar-footer.php, front-page.php
+│   ├── inc/cd-legacy-functions.php   — хелперы ColorMag (шапка/подвал/цвета рубрик)
 │   ├── inc/cd-legacy-widgets.php     — области виджетов со СТАРЫМИ id (colormag_*)
 │   ├── inc/widgets/…                 — 7 виджетов ColorMag (слайдер, избранные, баннеры)
+│   ├── assets/colormag/…             — оригинальные CSS/JS и FontAwesome ColorMag
 │   └── assets/css/cd-legacy.css      — стили перенесённых блоков
 └── server-scripts/
-    ├── 01-backup.sh              — бэкап старого сервера (файлы + БД + uploads)
-    ├── 02-deploy-wp.sh           — чистая установка WP последней версии
-    ├── 03-import-db.sh           — импорт old_dump.sql + замена домена + ЧПУ
-    ├── 04-setup-theme-plugins.sh — Motors + motors-child + плагины + меню
+    ├── setup-child-mods.php      — перенос настроек темы (лого, меню, цвета рубрик)
     ├── migrate-sidebars.php      — перенос виджетов правого сайдбара в Motors
     ├── 05-verify-content.php     — сверка контента с baseline (таблица сравнения)
     ├── 06-verify-images.php      — сверка медиатеки с реестром (после uploads!)
     ├── 07-redirects.php          — карта 301 (nginx/.htaccess)
-    ├── 08-notify-telegram.sh     — уведомления (опционально)
     ├── baseline.json             — эталонные счётчики старого сайта
     ├── baseline-post-urls.tsv    — 1198 URL старых постов (для сверки 301)
     └── registries/               — реестры ссылок на картинки (CSV)
@@ -77,49 +82,27 @@ FLUSH PRIVILEGES;
 
 2. Проверьте версии: `php -v` (8.1+), `mysql --version` (5.7+), `wp --version`.
 
-## ЭТАП 3. Чистая установка WordPress (Шаг 2 плана)
+## ЭТАП 3. Чистая установка WordPress (ШАГ 1–2/9 в run-migration.sh)
 
-```bash
-cd /root/migration
-SITE_DIR=/var/www/caranddriver.ru DOMAIN=caranddriver.ru \
-DB_NAME=wp_cdr DB_USER=wp_cdr DB_PASS='СЛОЖНЫЙ_ПАРОЛЬ' \
-bash server-scripts/02-deploy-wp.sh
-```
+> Выполняется автоматически скриптом `run-migration.sh` (копирует ядро из репозитория, создаёт wp-config). Вручную НЕ требуется.
 
-**Важно:** в `wp-config.php` будет задан префикс таблиц `wpla_` — **именно так префиксованы таблицы в старом дампе**; если поставить другой, импорт не подхватится. `wp core install` НЕ запускать — сайт наполняется импортом старой БД.
+**Важно:** в `wp-config.php` задан префикс таблиц `wpla_` — **именно так префиксованы таблицы в старом дампе**; если поставить другой, импорт не подхватится. `wp core install` НЕ запускать — сайт наполняется импортом старой БД. Также задаётся `FS_METHOD=direct` — установка тем/плагинов без FTP.
 
-## ЭТАП 4. Импорт старой базы данных (Шаг 3 плана)
+## ЭТАП 4. Импорт старой базы данных (ШАГ 3–6/9)
 
-Загрузите `database/old_dump.sql` из репозитория на сервер (`/root/migration/old_dump.sql`), затем:
-
-```bash
-SITE_DIR=/var/www/caranddriver.ru DUMP_FILE=/root/migration/old_dump.sql \
-bash server-scripts/03-import-db.sh
-```
-
-Скрипт: импортирует дамп (1–3 минуты), при смене домена выполнит `wp search-replace` (в нашем случае домен не меняется — замена пропускается), чистит транзиенты, задаёт ЧПУ `/%year%/%monthnum%/%day%/%postname%/` (как на старом сайте — все URL сохраняются 1:1) и обновляет схему БД под новую версию WP.
+> Выполняется автоматически: `run-migration.sh` импортирует `database/old_dump.sql` прямо из репозитория, при смене домена выполнит `wp search-replace`, задаст ЧПУ `/%year%/%monthnum%/%day%/%postname%/` (как на старом сайте — все URL сохраняются 1:1) и обновит схему БД под новую версию WP.
 
 > **Контрольная точка:** в конце скрипт печатает счётчики: постов **1198**, страниц **2**, вложений **8121**, комментариев **21 425**. Числа должны совпасть.
 
-## ЭТАП 5. Темы и плагины (Шаги 4–6 плана)
+## ЭТАП 5. Темы и плагины (ШАГ 7–9/9)
 
-1. Загрузите на сервер папку `motors-child/` и архив `motors-5.6.95.zip` (из репозитория `new-theme/Motors/`).
+1. Выполняется автоматически: `run-migration.sh` распакует Motors из репозитория (с проверкой), установит и активирует **motors-child** (с проверкой активации), установит и активирует плагины **из локальных zip репозитория** (Yoast SEO — SEO-мета постов подхватится из мета `_yoast_wpseo_*`, cyr3lat — транслитерация, captcha), очистит «хвосты» старого списка плагинов, перенесёт настройки старой темы (лого, меню, цвета рубрик, favicon) и привяжет меню.
 
-2. Запустите:
+2. **Демо-контент Motors НЕ импортировать.** Запуск Motors Demo Importer затрёт страницы и порядок блоков старого сайта — критерий приёмки нарушится.
 
-```bash
-SITE_DIR=/var/www/caranddriver.ru \
-MOTORS_ZIP=/root/migration/motors-5.6.95.zip \
-bash server-scripts/04-setup-theme-plugins.sh
-```
+3. Меню: привязка выполняется автоматически (из настроек старой темы). Если понадобится вручную: **Внешний вид → Меню → Управление областями** — меню «Main Menu» (9 пунктов) в область `primary`.
 
-Скрипт установит и активирует **motors-child** (родительский Motors останется нетронутым), установит актуальные плагины (Yoast SEO — SEO-мета постов подхватится из мета `_yoast_wpseo_*`, транслитерация, капча), очистит «хвосты» старого списка плагинов и выведет список локаций меню Motors.
-
-3. **Демо-контент Motors НЕ импортировать.** Запуск Motors Demo Importer затрёт страницы и порядок блоков старого сайта — критерий приёмки нарушится.
-
-4. Меню: если автопривязка не сработала, назначьте вручную: **Внешний вид → Меню → Управление областями** — меню «Main Menu» (9 пунктов) в главную локацию Motors.
-
-5. Сайдбар: посмотрите доступные области (`wp sidebar list --fields=id,name`), выберите боковую область Motors для записей и перенесите старые виджеты (настройки сохранятся, классы виджетов зарегистрированы в motors-child):
+4. Сайдбар: перенос выполняется автоматически (`run-migration.sh` дублирует старые виджеты правого сайдбара в боковую область Motors для страниц записей). При необходимости вручную: посмотрите доступные области (`wp sidebar list --fields=id,name`) и выполните:
 
 ```bash
 wp eval-file server-scripts/migrate-sidebars.php <target_sidebar_id> --dry-run
@@ -192,7 +175,7 @@ wp eval-file server-scripts/07-redirects.php
 
 5. Переключите DNS/веб-сервер на новую версию, снимите техобслуживание. Старый сервер держите выключенным, но с данными — минимум 2 недели (откат).
 
-6. Уведомление (опционально): `TG_TOKEN=… TG_CHAT_ID=… MSG="Миграция caranddriver.ru завершена" bash 08-notify-telegram.sh`.
+6. Уведомление (опционально): задайте `TG_TOKEN` и `TG_CHAT_ID` в config.env — скрипт отправит их сам после каждого этапа.
 
 ---
 
@@ -202,9 +185,9 @@ wp eval-file server-scripts/07-redirects.php
 |---|---|---|---|
 | 1 | Бэкап старого сервера | старый сервер | `01-backup.sh` |
 | 2 | Новая пустая БД | новый сервер | SQL из ЭТАПА 2 |
-| 3 | Чистый WP 6.x (префикс `wpla_`) | новый сервер | `02-deploy-wp.sh` |
-| 4 | Импорт `old_dump.sql` + ЧПУ | новый сервер | `03-import-db.sh` |
-| 5 | Motors + motors-child + плагины | новый сервер | `04-setup-theme-plugins.sh` |
+| 3 | Чистый WP (префикс `wpla_`) | новый сервер | `run-migration.sh config.env` (авто) |
+| 4 | Импорт `old_dump.sql` + ЧПУ | новый сервер | `run-migration.sh config.env` (авто) |
+| 5 | Motors + motors-child + плагины из zip | новый сервер | `run-migration.sh config.env` (авто) |
 | 6 | Меню + перенос сайдбара | новый сервер | `migrate-sidebars.php` |
 | 7 | Сверка контента с baseline | новый сервер | `05-verify-content.php` |
 | **8** | **Загрузка папки uploads** | старый → новый | **rsync / tar (ЭТАП 7)** |
